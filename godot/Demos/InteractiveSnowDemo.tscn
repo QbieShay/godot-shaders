@@ -1,0 +1,101 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://Demos/InteractiveSnow/InteractiveSnowball.gd" type="Script" id=1]
+[ext_resource path="res://Demos/InteractiveSnow/InteractiveSnowPlane.glb" type="PackedScene" id=2]
+[ext_resource path="res://Shared/Demo3DEnvironment.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Demos/InteractiveSnow/BlendTexture.png" type="Texture" id=4]
+[ext_resource path="res://Demos/InteractiveSnow/Brush.png" type="Texture" id=5]
+[ext_resource path="res://Demos/InteractiveSnow/InteractiveSnowViewport.gd" type="Script" id=6]
+[ext_resource path="res://Demos/InteractiveSnow/Textures/Snow004_1K_Roughness.png" type="Texture" id=7]
+[ext_resource path="res://Demos/InteractiveSnow/Textures/Ground039_1K_Normal.png" type="Texture" id=8]
+[ext_resource path="res://Demos/InteractiveSnow/Textures/Ground039_1K_Roughness.png" type="Texture" id=9]
+[ext_resource path="res://Shaders/interactive_snow.shader" type="Shader" id=10]
+[ext_resource path="res://Demos/InteractiveSnow/Textures/Snow004_1K_Normal.png" type="Texture" id=11]
+[ext_resource path="res://Demos/InteractiveSnow/Textures/Snow004_1K_Color.png" type="Texture" id=12]
+[ext_resource path="res://Demos/InteractiveSnow/Textures/Ground039_1K_Color.png" type="Texture" id=13]
+
+[sub_resource type="ViewportTexture" id=1]
+viewport_path = NodePath("Viewport")
+
+[sub_resource type="ShaderMaterial" id=2]
+resource_local_to_scene = true
+shader = ExtResource( 10 )
+shader_param/mask_texture_world_size = Vector2( 32, 32 )
+shader_param/snow_height = 0.2
+shader_param/snow_sharpness = 3.0
+shader_param/textures_tiling = Vector2( 5, 5 )
+shader_param/mask_texture = SubResource( 1 )
+shader_param/snow_texture = ExtResource( 12 )
+shader_param/snow_texture_normal = ExtResource( 11 )
+shader_param/snow_texture_roughness = ExtResource( 7 )
+shader_param/dirt_texture = ExtResource( 13 )
+shader_param/dirt_texture_normal = ExtResource( 8 )
+shader_param/dirt_texture_roughness = ExtResource( 9 )
+shader_param/blend_texture = ExtResource( 4 )
+
+[sub_resource type="Environment" id=3]
+background_mode = 1
+background_color = Color( 1, 1, 1, 1 )
+background_energy = 8.02
+ambient_light_color = Color( 1, 1, 1, 1 )
+
+[sub_resource type="SphereMesh" id=4]
+radius = 0.5
+height = 1.0
+
+[node name="InteractiveSnowDemo" type="Spatial"]
+
+[node name="Demo3DEnvironment" parent="." instance=ExtResource( 3 )]
+
+[node name="Sun" parent="Demo3DEnvironment" index="1"]
+transform = Transform( 0.919232, 0.151786, -0.363282, 0, 0.9227, 0.38552, 0.393717, -0.354382, 0.848175, 0, 3.77878, 6.87228 )
+
+[node name="Ground" parent="Demo3DEnvironment" index="2"]
+visible = false
+
+[node name="InteractiveSnowPlane" parent="." instance=ExtResource( 2 )]
+transform = Transform( 0.5, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 0, 0 )
+
+[node name="Plane" parent="InteractiveSnowPlane" index="0"]
+material_override = SubResource( 2 )
+
+[node name="Viewport" type="Viewport" parent="."]
+size = Vector2( 128, 128 )
+own_world = true
+transparent_bg = true
+handle_input_locally = false
+hdr = false
+render_target_v_flip = true
+render_target_clear_mode = 2
+render_target_update_mode = 3
+script = ExtResource( 6 )
+interactive_actor_path = NodePath("../InteractiveSnowball")
+interactive_actor_footprint = NodePath("Sprite")
+interactive_snow_size = Vector2( 16, 16 )
+
+[node name="Sprite" type="Sprite" parent="Viewport"]
+texture = ExtResource( 5 )
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Viewport"]
+environment = SubResource( 3 )
+
+[node name="ViewportContainer" type="ViewportContainer" parent="."]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="InteractiveSnowball" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0 )
+mesh = SubResource( 4 )
+material/0 = null
+script = ExtResource( 1 )
+trail_sprite_path = NodePath("../Viewport/Sprite")
+
+[node name="Camera" type="Camera" parent="InteractiveSnowball"]
+transform = Transform( 1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 2.06231, 5.46691 )
+
+[editable path="Demo3DEnvironment"]
+[editable path="InteractiveSnowPlane"]
