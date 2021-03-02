@@ -27,7 +27,7 @@ func _process(delta):
 	get_node(interactive_actor_footprint).global_position = (player_pos/ interactive_snow_size) * size
 	var line = get_node("Line2D")
 	line.add_point( (player_pos/ interactive_snow_size) * size)
-	if line.get_point_count() > 64:
+	if line.get_point_count() > 1024:
 		var old_line = line.duplicate()
 		add_child(old_line)
 		line.clear_points()
